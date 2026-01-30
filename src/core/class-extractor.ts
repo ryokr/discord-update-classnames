@@ -3,7 +3,8 @@ import * as acorn from "acorn";
 import * as walk from "acorn-walk";
 import fs from "fs";
 import path from "path";
-import { CLASS_NAME_REGEX } from "../constants";
+import { CSS_IDENTIFIER_REGEX, CLASS_HASH_SPLIT_REGEX, HASH_ENTROPY_REGEX } from "../constants";
+
 
 export type ExportMap = Record<string, Record<string, string>>;
 
@@ -181,23 +182,26 @@ function processExpression(node: acorn.Expression): string {
 }
 
 /**
- * Checks if a string is a valid class name.
- * @param string The string to check.
- * @returns Whether the string is a valid class name.
+ * Checks if a string contains only valid CSS class identifiers.
+ * This follows the CSS specification instead of assuming a fixed hash pattern.
+ * @param value The string to check.
+ * @returns Whether all class names are valid CSS identifiers.
  */
-function isValidClassName(string: string) {
-    return CLASS_NAME_REGEX.test(string);
+function isValidClassName(value: string) {
+    return value.split(" ").every(cls => CSS_IDENTIFIER_REGEX.test(cls));
 }
 
 /**
- * Extracts the semantic name from a class name string.
+ * Extracts the semantic portion of a hashed class name.
+ * Dynamically separates the readable semantic prefix from
+ * the hashed suffix without assuming a fixed hash length.
  * @param className The full class name string.
- * @returns The semantic name.
+ * @returns The inferred semantic name, if detectable.
  */
 function getSemanticName(className: string): string | undefined {
-    const firstClass = className.includes(" ") ? className.split(" ")[0] : className;
-    const semanticName = firstClass?.slice(0, -7); // -7 is to remove the hash and separator part
-    return semanticName || undefined;
+    const first = className.split(" ")[0];
+    const match = first.match(CLASS_HASH_SPLIT_REGEX);
+    return match?.[1];
 }
 
 /**
@@ -215,37 +219,47 @@ function extractExports(node: acorn.Expression | null | undefined) {
                 // Catch class names concatenated with other class names
                 const className = processExpression(prop.value);
                 if (className && (prop.key.type === "Identifier" || prop.key.type === "Literal")) {
-                    const matchedClassName = className.match(CLASS_NAME_REGEX)?.[0];
-                    if (matchedClassName) {
-                        const semanticName = getSemanticName(matchedClassName);
-                        if (semanticName) {
-                            exports[semanticName] = className;
-                            const mangledName =
-                                prop.key.type === "Identifier" ? prop.key.name : prop.key.value?.toString();
-                            if (mangledName) {
-                                mangledToSemantic[mangledName] = semanticName;
-                            }
-                        }
+                    const firstClass = className.split(" ")[0];
+                    // skip non-hashed concatenations
+                    if (!HASH_ENTROPY_REGEX.test(firstClass)) return;
+                    
+                    const semanticName = getSemanticName(firstClass);
+                    if (semanticName) {
+                    	exports[semanticName] = className;
+
+                    	const mangledName =
+                    		prop.key.type === "Identifier" ? prop.key.name : prop.key.value?.toString();
+
+                    	if (mangledName) {
+                    		mangledToSemantic[mangledName] = semanticName;
+                    	}
                     }
+
                 }
             } else if (
-                prop.type === "Property" &&
-                prop.value.type === "Literal" &&
-                prop.value.value &&
-                (prop.key.type === "Identifier" || prop.key.type === "Literal") &&
-                isValidClassName(prop.value.value.toString())
+            	prop.type === "Property" &&
+            	prop.value.type === "Literal" &&
+            	prop.value.value &&
+            	(prop.key.type === "Identifier" || prop.key.type === "Literal") &&
+            	isValidClassName(prop.value.value.toString())
             ) {
-                // Catch normal class names
-                const className = prop.value.value.toString();
-                const semanticName = getSemanticName(className);
-                if (semanticName) {
-                    exports[semanticName] = className;
+            	const className = prop.value.value.toString();
+            
+            	// Guard: ensure this actually looks hashed
+            	if (!HASH_ENTROPY_REGEX.test(className)) return;
+            
+            	const semanticName = getSemanticName(className);
+            	if (semanticName) {
+            		exports[semanticName] = className;
+
                     const mangledName = prop.key.type === "Identifier" ? prop.key.name : prop.key.value?.toString();
-                    if (mangledName) {
-                        mangledToSemantic[mangledName] = semanticName;
-                    }
-                }
+            
+            		if (mangledName) {
+            			mangledToSemantic[mangledName] = semanticName;
+            		}
+            	}
             }
+
         });
     }
 
