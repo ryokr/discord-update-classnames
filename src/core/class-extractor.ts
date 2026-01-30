@@ -199,9 +199,9 @@ function isValidClassName(value: string) {
  * @returns The inferred semantic name, if detectable.
  */
 function getSemanticName(className: string): string | undefined {
-    const first = className.split(" ")[0];
-    const match = first.match(CLASS_HASH_SPLIT_REGEX);
-    return match?.[1];
+    const firstClass = className.includes(" ") ? className.split(" ")[0] : className;
+    const match = firstClass.match(CLASS_HASH_SPLIT_REGEX);
+    return match?.[1] || undefined;
 }
 
 /**
@@ -222,19 +222,18 @@ function extractExports(node: acorn.Expression | null | undefined) {
                     const firstClass = className.split(" ")[0];
                     // skip non-hashed concatenations
                     if (!HASH_ENTROPY_REGEX.test(firstClass)) return;
-                    
+
                     const semanticName = getSemanticName(firstClass);
                     if (semanticName) {
-                    	exports[semanticName] = className;
+                        exports[semanticName] = className;
 
-                    	const mangledName =
-                    		prop.key.type === "Identifier" ? prop.key.name : prop.key.value?.toString();
+                        const mangledName =
+                        prop.key.type === "Identifier" ? prop.key.name : prop.key.value?.toString();
 
-                    	if (mangledName) {
-                    		mangledToSemantic[mangledName] = semanticName;
-                    	}
+                        if (mangledName) {
+                            mangledToSemantic[mangledName] = semanticName;
+                        }
                     }
-
                 }
             } else if (
             	prop.type === "Property" &&
