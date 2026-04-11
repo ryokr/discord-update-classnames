@@ -5,13 +5,13 @@
     "bugs": {
         "url": "https://github.com/fedeericodl/discord-update-classnames/issues"
     },
-    "author": "fedeericodl",
-    "license": "MIT",
-    "main": "dist/extractor/index.js",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/fedeericodl/discord-update-classnames.git"
     },
+    "license": "MIT",
+    "author": "fedeericodl",
+    "main": "dist/extractor/index.js",
     "scripts": {
         "start": "node dist/extractor/index.js",
         "start:debug": "node dist/extractor/index.js --debug-extract",
@@ -29,17 +29,17 @@
     "dependencies": {
         "@actions/core": "^3.0.0",
         "@actions/glob": "^0.6.1",
-        "acorn": "^8.15.0",
-        "acorn-walk": "^8.3.4"
+        "acorn": "^8.16.0",
+        "acorn-walk": "^8.3.5"
     },
     "devDependencies": {
-        "@eslint/js": "^9.39.2",
-        "@types/node": "^25.1.0",
-        "eslint": "^9.39.2",
+        "@eslint/js": "^10.0.1",
+        "@types/node": "^24.12.2",
+        "eslint": "^10.2.0",
         "eslint-config-prettier": "^10.1.8",
-        "globals": "^17.2.0",
-        "prettier": "^3.8.1",
-        "typescript": "^5.9.3",
-        "typescript-eslint": "^8.54.0"
+        "globals": "^17.4.0",
+        "prettier": "^3.8.2",
+        "typescript": "^6.0.2",
+        "typescript-eslint": "^8.58.1"
     }
 }
