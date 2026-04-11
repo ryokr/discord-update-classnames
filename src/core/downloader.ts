@@ -112,6 +112,6 @@ export default async function downloadScripts(directory: string) {
 
         return true;
     } catch (error) {
-        throw new Error(`Download failed: ${error}`);
+        throw new Error(`Download failed: ${error}`, { cause: error });
     }
 }

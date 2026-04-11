@@ -88,7 +88,7 @@ export default async function processThemeFiles(
                 core.info(`No changes made to ${relativePath}`);
             }
         } catch (error) {
-            throw new Error(`Failed to process file: ${filePath}\n${error}`);
+            throw new Error(`Failed to process file: ${filePath}\n${error}`, { cause: error });
         }
     }
 

@@ -133,6 +133,6 @@ export default function genMaps(oldClassNames: ExportMap, classNames: ExportMap)
 
         if (changesFound) return classMap;
     } catch (error) {
-        throw new Error(`Failed to generate class map: ${error}`);
+        throw new Error(`Failed to generate class map: ${error}`, { cause: error });
     }
 }

@@ -1,24 +1,31 @@
 {
     "compilerOptions": {
-        // Base Options recommended for all projects
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "target": "es2022",
-        "allowJs": true,
-        "resolveJsonModule": true,
-        "moduleDetection": "force",
-        "isolatedModules": true,
-        "verbatimModuleSyntax": true,
-        // Enable strict type checking so you can catch bugs early
-        "strict": true,
+        // File Layout
+        "rootDir": "./src",
+        "outDir": "./lib",
+
+        // Environment Settings
+        "target": "es2025",
+        "types": ["node"],
+        "lib": ["ES2025"],
+
+        // Stricter Typechecking Options
         "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true,
+
+        // Style Options
         "noImplicitOverride": true,
-        // Transpile our TypeScript code to JavaScript
-        "module": "Preserve",
-        "outDir": "lib",
-        "lib": ["es2022"]
+
+        // Recommended Options
+        "strict": true,
+        "verbatimModuleSyntax": true,
+        "isolatedModules": true,
+        "noUncheckedSideEffectImports": true,
+        "moduleDetection": "force",
+        "skipLibCheck": true,
+        "allowJs": true,
+        "resolveJsonModule": true
     },
-    // Include the necessary files for your project
     "include": ["**/*.ts"],
     "exclude": ["dist", "node_modules"]
 }
