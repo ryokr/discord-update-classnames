@@ -76,7 +76,6 @@ async function downloadScripts(directory: string) {
         core.debug(`Fetching main entrypoint ('web') from ${WEBSITE}/assets/${mainEntrypointPath}`);
 
         const mainEntrypointRes = await fetchText(`${WEBSITE}/assets/${mainEntrypointPath}`);
-        const versionHash = mainEntrypointRes.match(VERSION_HASH_REGEX)?.[1];
 
         const sentryEntrypointPath = scriptPaths.find((p) => p.includes("sentry"));
         if (!sentryEntrypointPath) throw new Error("Sentry entrypoint script not found");
@@ -84,6 +83,7 @@ async function downloadScripts(directory: string) {
         core.debug(`Fetching sentry entrypoint from ${WEBSITE}/assets/${sentryEntrypointPath}`);
 
         const sentryEntrypointRes = await fetchText(`${WEBSITE}/assets/${sentryEntrypointPath}`);
+        const versionHash = sentryEntrypointRes.match(VERSION_HASH_REGEX)?.[1];
         const builtAt = sentryEntrypointRes.match(BUILT_AT_REGEX)?.[1];
 
         if (!handleBuildInfo(versionHash, builtAt)) return false;
