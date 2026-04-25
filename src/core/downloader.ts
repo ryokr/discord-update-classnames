@@ -7,6 +7,7 @@ import {
     CHUNKS_REGEX,
     HTML_REGEX,
     JSON_FIX_REGEX,
+    TERNARY_CHUNKS_REGEX,
     VERSION_HASH_REGEX,
     WEBSITE,
 } from "../constants";
@@ -56,7 +57,7 @@ function handleBuildInfo(versionHash: string | undefined, builtAt: string | unde
  * @returns Whether the download was successful.
  * @throws Will throw an error if the download fails.
  */
-export default async function downloadScripts(directory: string) {
+async function downloadScripts(directory: string) {
     try {
         core.debug(`Fetching main page from ${WEBSITE}/app`);
         const siteRes = await fetchText(`${WEBSITE}/app`);
@@ -73,12 +74,14 @@ export default async function downloadScripts(directory: string) {
         if (!mainEntrypointPath) throw new Error("Main entrypoint ('web') script not found");
 
         core.debug(`Fetching main entrypoint ('web') from ${WEBSITE}/assets/${mainEntrypointPath}`);
-        const mainEntrypointRes = await fetchText(`${WEBSITE}/assets/${mainEntrypointPath}`);
 
+        const mainEntrypointRes = await fetchText(`${WEBSITE}/assets/${mainEntrypointPath}`);
         const versionHash = mainEntrypointRes.match(VERSION_HASH_REGEX)?.[1];
 
         const sentryEntrypointPath = scriptPaths.find((p) => p.includes("sentry"));
         if (!sentryEntrypointPath) throw new Error("Sentry entrypoint script not found");
+
+        core.debug(`Fetching sentry entrypoint from ${WEBSITE}/assets/${sentryEntrypointPath}`);
 
         const sentryEntrypointRes = await fetchText(`${WEBSITE}/assets/${sentryEntrypointPath}`);
         const builtAt = sentryEntrypointRes.match(BUILT_AT_REGEX)?.[1];
@@ -89,14 +92,21 @@ export default async function downloadScripts(directory: string) {
         fs.rmSync(directory, { recursive: true, force: true });
         fs.mkdirSync(directory, { recursive: true });
 
+        // Parse Ternary Chunks
+        let ternaryMatch;
+        while ((ternaryMatch = TERNARY_CHUNKS_REGEX.exec(mainEntrypointRes)) !== null) {
+            scriptPaths.push(`${ternaryMatch[1]}.${ternaryMatch[2]}.js`);
+        }
+
+        // Parse Standard Chunks
         const chunks = [...mainEntrypointRes.matchAll(CHUNKS_REGEX)]
             .map((m) => m[1])
             .filter((v): v is string => !!v)
             .map((v) => v.replace(JSON_FIX_REGEX, '"$1":'));
 
-        if (!chunks[1]) throw new Error("No chunks found");
+        if (!chunks[0]) throw new Error("No chunks found");
 
-        const chunksData = JSON.parse(chunks[1]);
+        const chunksData = JSON.parse(chunks[0]);
         Object.values(chunksData).forEach((chunk) => scriptPaths.push(`${chunk}.js`));
 
         let completed = 0;
@@ -115,3 +125,5 @@ export default async function downloadScripts(directory: string) {
         throw new Error(`Download failed: ${error}`, { cause: error });
     }
 }
+
+export default downloadScripts;

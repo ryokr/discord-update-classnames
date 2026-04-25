@@ -34,7 +34,7 @@ interface ClassReplacerStats {
  * @param ignoredClassNames A list of class names to ignore during replacement.
  * @returns The statistics of the replacement process.
  */
-export default async function processThemeFiles(
+async function processThemeFiles(
     files: string[],
     classMap: Record<string, string>,
     ignoredClassNames: string[] = [],
@@ -99,3 +99,5 @@ export default async function processThemeFiles(
 
     return stats;
 }
+
+export default processThemeFiles;

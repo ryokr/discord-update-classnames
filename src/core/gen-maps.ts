@@ -59,7 +59,7 @@ function checkModules(oldFile: ExportMap, newFile: ExportMap, moduleChangeThresh
  * @param classNames The new class names.
  * @returns The class map.
  */
-export default function genMaps(oldClassNames: ExportMap, classNames: ExportMap) {
+function genMaps(oldClassNames: ExportMap, classNames: ExportMap) {
     try {
         // This check is necessary: sometimes module IDs may change, but the content is the same
         const moduleCheckResult = checkModules(oldClassNames, classNames);
@@ -136,3 +136,5 @@ export default function genMaps(oldClassNames: ExportMap, classNames: ExportMap)
         throw new Error(`Failed to generate class map: ${error}`, { cause: error });
     }
 }
+
+export default genMaps;

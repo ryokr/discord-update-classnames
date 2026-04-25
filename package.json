@@ -27,19 +27,19 @@
         "lint:fix": "pnpm run prettier:fix && pnpm run eslint:fix && pnpm run typescript:check"
     },
     "dependencies": {
-        "@actions/core": "^3.0.0",
-        "@actions/glob": "^0.6.1",
+        "@actions/core": "^3.0.1",
+        "@actions/glob": "^0.7.0",
         "acorn": "^8.16.0",
         "acorn-walk": "^8.3.5"
     },
     "devDependencies": {
         "@eslint/js": "^10.0.1",
-        "@types/node": "^24.12.2",
-        "eslint": "^10.2.0",
+        "@types/node": "^25.6.0",
+        "eslint": "^10.2.1",
         "eslint-config-prettier": "^10.1.8",
-        "globals": "^17.4.0",
-        "prettier": "^3.8.2",
-        "typescript": "^6.0.2",
-        "typescript-eslint": "^8.58.1"
+        "globals": "^17.5.0",
+        "prettier": "^3.8.3",
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.59.0"
     }
 }

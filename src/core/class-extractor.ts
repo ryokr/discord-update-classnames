@@ -257,7 +257,7 @@ function extractExports(node: acorn.Expression | null | undefined) {
  * @param directory The directory to process.
  * @returns The exports data.
  */
-export default function extractClassNames(directory: string) {
+function extractClassNames(directory: string) {
     core.debug(`Processing directory: ${directory}`);
     const allExports: ExportMap = {};
 
@@ -317,3 +317,5 @@ export default function extractClassNames(directory: string) {
 
     return allExports;
 }
+
+export default extractClassNames;
